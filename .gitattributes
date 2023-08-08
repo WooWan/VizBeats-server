@@ -1,0 +1,2 @@
+pretrained_models/5stems/model.index filter=lfs diff=lfs merge=lfs -text
+pretrained_models/**/*.index filter=lfs diff=lfs merge=lfs -text
