@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "vizbeats"
+version = "0.1.0"
+description = ""
+authors = ["WooWan <woohobi@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.11"
+fastapi = "^0.101.0"
+uvicorn = "^0.23.2"
+sqlalchemy = "^2.0.19"
+boto3 = "^1.28.24"
+demucs = { git = "https://github.com/facebookresearch/demucs.git", branch = "main" }
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
