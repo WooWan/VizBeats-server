@@ -1,5 +1,7 @@
+FROM python:3.10-slim-buster as base
 
-FROM python:3.10-slim-buster as requirements-stage
+
+FROM base as requirements
 
 #
 WORKDIR /tmp
@@ -10,29 +12,32 @@ RUN pip install poetry
 #
 COPY ./pyproject.toml ./poetry.lock* /tmp/
 
-RUN poetry export -f requirements.txt --output requirements.txt --without-hashes
+RUN poetry export -f requirements.txt --output requirements.txt --without-hashes --without dev
 
 
 #base stage
-FROM python:3.10-slim-buster as base-stage
+FROM base as deps
 
 WORKDIR /code
 
 #
-COPY --from=requirements-stage /tmp/requirements.txt /code/requirements.txt
+COPY --from=requirements /tmp/requirements.txt /code/requirements.txt
 
 #
-RUN apt-get update && apt-get install -y git
-RUN pip install --no-cache-dir --upgrade -r /code/requirements.txt
-
+RUN apt-get update && apt-get install -y git \
+    && pip install --no-cache-dir --upgrade -r /code/requirements.txt \
+    &&  rm -rf /var/lib/apt/lists/*
 
 #
-FROM python:3.10-slim-buster
+FROM base as runner
 
 WORKDIR /code
 
-COPY --from=base-stage /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
-COPY --from=base-stage /usr/local/bin/ /usr/local/bin/
+RUN apt-get update && apt-get install -y ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=deps /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
+COPY --from=deps /usr/local/bin /usr/local/bin
 
 #
 COPY ./app /code/app
