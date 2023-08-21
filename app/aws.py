@@ -2,6 +2,9 @@ import boto3
 import os, io
 from botocore.exceptions import NoCredentialsError
 import mimetypes
+from dotenv import load_dotenv
+
+load_dotenv()
 
 ACCESS_KEY = os.getenv("AWS_ACCESS_KEY")
 SECRET_KEY = os.getenv("AWS_SECRET_KEY")
