@@ -12,6 +12,12 @@ uvicorn = "^0.23.2"
 sqlalchemy = "^2.0.19"
 boto3 = "^1.28.24"
 demucs = { git = "https://github.com/facebookresearch/demucs.git", branch = "main" }
+psycopg2-binary = "^2.9.7"
+python-multipart = "^0.0.6"
+
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.7.0"
 
 [build-system]
 requires = ["poetry-core"]
