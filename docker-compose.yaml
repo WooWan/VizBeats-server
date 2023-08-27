@@ -2,6 +2,6 @@ version: "3.8"
 
 services:
   fastapi:
-    image: "woohobi/viz-beats:latest"
+    image: "woohobi/vizbeat:latest"
     ports:
       - "80:80"
