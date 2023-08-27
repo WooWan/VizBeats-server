@@ -72,6 +72,7 @@ async def music_separation(
     guitar_path = Path(path, model, audio_name, "guitar.mp3")
     bass_path = Path(path, model, audio_name, "bass.mp3")
     # other_path = Path(path, folder, "audio", "other.mp3")
+    # cons
 
     with temp_file.open("rb") as file:
         upload_file_to_s3(file, "audio.mp3", folder)
