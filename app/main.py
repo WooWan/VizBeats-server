@@ -114,3 +114,24 @@ async def music_separation(
     music_create_schema = MusicCreate(**music)
     crud.create_music(db=db, music=music_create_schema)
     return {"filename"}
+
+
+@app.post("/youtube-search")
+def youtube_search():
+    query = request.args.get('query')
+    response = jsonify(perform_search(query))
+    return response
+
+@app.post("/youtoube-download")
+def youtube_download():
+    url = request.args.get('url')
+    base_path = '/'
+    title = request.args.get('title')
+    webm_path = base_path + title + '.webm'
+    mp3_path = base_path + title + '.mp3'
+    download_from_url(url, webm_path)
+    webm_to_mp3(webm_path, mp3_path)
+    return {"youtube download"}
+
+
+
