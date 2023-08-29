@@ -10,6 +10,8 @@ from sqlalchemy.orm import Session
 from typing import Union
 from .schemas import MusicCreate
 import demucs.separate
+from fastapi.encoders import jsonable_encoder
+from .ytdl import download_from_url, webm_to_mp3, perform_search
 
 models.Base.metadata.create_all(bind=engine)
 app = FastAPI()
@@ -117,16 +119,13 @@ async def music_separation(
 
 
 @app.post("/youtube-search")
-def youtube_search():
-    query = request.args.get('query')
-    response = jsonify(perform_search(query))
+def youtube_search(query):
+    response = jsonable_encoder(perform_search(query))
     return response
 
 @app.post("/youtoube-download")
-def youtube_download():
-    url = request.args.get('url')
+def youtube_download(url, title):
     base_path = '/'
-    title = request.args.get('title')
     webm_path = base_path + title + '.webm'
     mp3_path = base_path + title + '.mp3'
     download_from_url(url, webm_path)
