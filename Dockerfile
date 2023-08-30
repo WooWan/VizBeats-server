@@ -1,6 +1,5 @@
 FROM python:3.10-slim-buster as base
 
-
 FROM base as requirements
 
 #
@@ -15,19 +14,17 @@ COPY ./pyproject.toml ./poetry.lock* /tmp/
 RUN poetry export -f requirements.txt --output requirements.txt --without-hashes --without dev
 
 
-#base stage
+#deps stage
 FROM base as deps
 
 WORKDIR /code
-
 #
 COPY --from=requirements /tmp/requirements.txt /code/requirements.txt
 
 #
 RUN apt-get update && apt-get install -y git \
     && pip install --no-cache-dir --upgrade -r /code/requirements.txt \
-    &&  rm -rf /var/lib/apt/lists/*
-
+    && rm -rf /var/lib/apt/lists/*
 #
 FROM base as runner
 
@@ -38,8 +35,7 @@ RUN apt-get update && apt-get install -y ffmpeg \
 
 COPY --from=deps /usr/local/lib/python3.10/site-packages/ /usr/local/lib/python3.10/site-packages/
 COPY --from=deps /usr/local/bin /usr/local/bin
-
-#
+COPY ./.env /code/.env
 COPY ./app /code/app
 
 #
