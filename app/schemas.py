@@ -7,11 +7,15 @@ class MusicCreate(BaseModel):
     artist: str
     albumCover: str
     musicUrl: str
+
+
+class MusicUpdate(BaseModel):
     bassUrl: str
     guitarUrl: str
     drumUrl: str
     pianoUrl: str
     vocalUrl: str
+    otherUrl: str
 
 
 class MusicData(BaseModel):
