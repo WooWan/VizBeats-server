@@ -6,7 +6,7 @@ from .models import Music
 
 
 def create_music(db: Session, music: schemas.MusicCreate):
-    db_music = models.Music(**music.model_dump(), userId="clkza1yhr0000958swtsmyztm")
+    db_music = models.Music(**music.model_dump(), userId="clkza4nyv0001958szh0fn7y4")
     db.add(db_music)
     db.commit()
     db.refresh(db_music)
