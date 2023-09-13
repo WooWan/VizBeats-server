@@ -138,6 +138,8 @@ async def music_separation(
     filename = f"{name}.{file_format}"
     audio_path = Path(download_path, filename)
 
+    Path(download_path).mkdir(parents=True, exist_ok=True)
+
     # if there is no audio, create youtube url
     if audio is None:
         youtube_url = f"https://www.youtube.com/watch?v={videoId}"
