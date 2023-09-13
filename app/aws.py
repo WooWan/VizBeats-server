@@ -20,20 +20,19 @@ def upload_file_to_s3(file_object, filename, folder):
         if hasattr(file_object, "file"):
             contents = file_object.file.read()
         else:
+            # 유튜브로 업로드 했을 경우
             contents = file_object.read()
 
         mime_type, _ = mimetypes.guess_type(filename)
         temp_file = io.BytesIO()
         temp_file.write(contents)
+
         temp_file.seek(0)
         s3.upload_fileobj(
             temp_file,
             "vizbeats",
             f"{folder}/{filename}",
-            ExtraArgs={
-                "ContentType": mime_type,
-                "ContentDisposition": "inline",
-            },
+            ExtraArgs={"ContentType": "audio/mpeg"},
         )
         temp_file.close()
     except FileNotFoundError:
