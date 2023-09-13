@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import Column, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from .database import Base
@@ -26,7 +28,7 @@ class Music(Base):
     pianoUrl = Column(String)
     vocalUrl = Column(String)
     otherUrl = Column(String)
-    createdAt = Column(DateTime)
+    createdAt = Column(DateTime, default=datetime.utcnow)
 
     userId = Column(String, ForeignKey("User.id"), name="user_id")
     user = relationship("User", back_populates="musics")
