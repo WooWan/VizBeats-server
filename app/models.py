@@ -26,6 +26,7 @@ class Music(Base):
     pianoUrl = Column(String)
     vocalUrl = Column(String)
     otherUrl = Column(String)
+    createdAt = Column(DateTime)
 
     userId = Column(String, ForeignKey("User.id"), name="user_id")
     user = relationship("User", back_populates="musics")
