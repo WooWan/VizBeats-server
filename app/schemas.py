@@ -3,6 +3,7 @@ from fastapi import File, UploadFile
 
 
 class MusicCreate(BaseModel):
+    userId: str
     title: str
     artist: str
     albumCover: str

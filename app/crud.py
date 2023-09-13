@@ -6,7 +6,7 @@ from .models import Music
 
 
 def create_music(db: Session, music: schemas.MusicCreate):
-    db_music = models.Music(**music.model_dump(), userId="clkza4nyv0001958szh0fn7y4")
+    db_music = models.Music(**music.model_dump())
     db.add(db_music)
     db.commit()
     db.refresh(db_music)
@@ -32,3 +32,7 @@ def update_music(db: Session, music_update: schemas.MusicUpdate, music_id):
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.User).offset(skip).limit(limit).all()
+
+
+def get_user_by_id(db: Session, user_id: str):
+    return db.query(models.User).filter(models.User.id == user_id).first()
