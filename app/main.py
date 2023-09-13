@@ -6,8 +6,9 @@ from fastapi import (
     Depends,
     Form,
     HTTPException,
+    Request,
 )
-import shutil, os
+import shutil, os, hashlib
 from . import config, crud
 from . import models
 from .aws import upload_file_to_s3
@@ -22,7 +23,6 @@ import demucs.separate
 from fastapi.encoders import jsonable_encoder
 from .ytdl import (
     download_from_url,
-    webm_to_mp3,
     perform_search,
     download_image_from_url,
 )
@@ -67,7 +67,7 @@ def process_music_separation(
 ):
     path = Path("separated")
     model = "htdemucs_6s"
-    demucs.separate.main(["--mp3", "--mp3-preset=7", "-n", model, str(audio_path)])
+    demucs.separate.main(["--mp3", "--mp3-preset=2", "-n", model, str(audio_path)])
 
     vocals_path = Path(path, model, folder, "vocals.mp3")
     drums_path = Path(path, model, folder, "drums.mp3")
@@ -121,9 +121,16 @@ def youtube_search(query, limit):
         raise HTTPException(status_code=429, detail="Exceed api usage limitation")
 
 
+def generate_user_id(ip_address: str):
+    md5 = hashlib.md5()
+    md5.update((ip_address + os.getenv("IP_ADDRESS_SALT")).encode("utf-8"))
+    return md5.hexdigest()
+
+
 @app.post("/music-separation")
 async def music_separation(
     background_tasks: BackgroundTasks,
+    request: Request,
     title: Annotated[str, Form(...)],
     artist: Annotated[str, Form(...)],
     videoId: Optional[str] = Form(None),
@@ -131,6 +138,16 @@ async def music_separation(
     audio: UploadFile | None = None,
     db: Session = Depends(get_db),
 ):
+    ip_address = request.client.host or "127.0.0.1"
+    user_id = generate_user_id(ip_address)
+    user = crud.get_user_by_id(db, user_id)
+
+    if user is None:
+        user = models.User(id=user_id, name="anonymous")
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
     file_format = "m4a"
     name = title
 
@@ -168,8 +185,9 @@ async def music_separation(
         "artist": artist,
         "albumCover": albumCoverUrl,
         "musicUrl": f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/{title}.{file_format}",
-        "userId": "clkza1yhr0000958swtsmyztm",
+        "userId": user.id,
     }
+
     music_create_schema = MusicCreate(**music)
     created_music = crud.create_music(db=db, music=music_create_schema)
 
