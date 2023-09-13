@@ -165,7 +165,7 @@ async def music_separation(
         "title": title,
         "artist": artist,
         "albumCover": albumCoverUrl,
-        "musicUrl": f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/audio.{file_format}",
+        "musicUrl": f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/{title}.{file_format}",
         "userId": "clkza1yhr0000958swtsmyztm",
     }
     music_create_schema = MusicCreate(**music)
