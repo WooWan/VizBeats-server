@@ -105,11 +105,11 @@ def process_music_separation(
     music_update_schema = MusicUpdate(**updated_music)
     crud.update_music(db, music_update_schema, music.id)
 
-    # if path.exists() and path.is_dir():
-    #     shutil.rmtree(path)
-    #
-    # if audio_path.exists() and audio_path.is_file():
-    #     os.remove(audio_path)
+    if path.exists() and path.is_dir():
+        shutil.rmtree(path)
+
+    if audio_path.exists() and audio_path.is_file():
+        os.remove(audio_path)
 
 
 @app.get("/youtube-search")
