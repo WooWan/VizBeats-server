@@ -61,20 +61,20 @@ def get_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 def process_music_separation(
     music: Music,
     title: str,
-    folder: str,
     audio_path: Path,
     db: Session = Depends(get_db),
 ):
     path = Path("separated")
     model = "htdemucs_6s"
+
     demucs.separate.main(["--mp3", "--mp3-preset=2", "-n", model, str(audio_path)])
 
-    vocals_path = Path(path, model, folder, "vocals.mp3")
-    drums_path = Path(path, model, folder, "drums.mp3")
-    piano_path = Path(path, model, folder, "piano.mp3")
-    guitar_path = Path(path, model, folder, "guitar.mp3")
-    bass_path = Path(path, model, folder, "bass.mp3")
-    other_path = Path(path, model, folder, "other.mp3")
+    vocals_path = Path(path, model, title, "vocals.mp3")
+    drums_path = Path(path, model, title, "drums.mp3")
+    piano_path = Path(path, model, title, "piano.mp3")
+    guitar_path = Path(path, model, title, "guitar.mp3")
+    bass_path = Path(path, model, title, "bass.mp3")
+    other_path = Path(path, model, title, "other.mp3")
 
     with vocals_path.open("rb") as file:
         upload_file_to_s3(file, "vocals.mp3", title)
@@ -105,11 +105,11 @@ def process_music_separation(
     music_update_schema = MusicUpdate(**updated_music)
     crud.update_music(db, music_update_schema, music.id)
 
-    if path.exists() and path.is_dir():
-        shutil.rmtree(path)
-
-    if audio_path.exists() and audio_path.is_file():
-        os.remove(audio_path)
+    # if path.exists() and path.is_dir():
+    #     shutil.rmtree(path)
+    #
+    # if audio_path.exists() and audio_path.is_file():
+    #     os.remove(audio_path)
 
 
 @app.get("/youtube-search")
@@ -148,17 +148,15 @@ async def music_separation(
         db.commit()
         db.refresh(user)
 
-    file_format = "m4a"
-    name = title
-
     download_path = "app/separated"
-    filename = f"{name}.{file_format}"
-    audio_path = Path(download_path, filename)
-
-    Path(download_path).mkdir(parents=True, exist_ok=True)
 
     # if there is no audio, create youtube url
     if audio is None:
+        file_format = "m4a"
+        filename = f"{title}.{file_format}"
+        audio_path = Path(download_path, filename)
+        Path(download_path).mkdir(parents=True, exist_ok=True)
+
         youtube_url = f"https://www.youtube.com/watch?v={videoId}"
         download_from_url(youtube_url, download_path, filename)
 
@@ -166,16 +164,22 @@ async def music_separation(
             upload_file_to_s3(file, filename, title)
 
     else:
-        filename, _ = os.path.splitext(audio.filename)
+        filename, ext = os.path.splitext(audio.filename)
+        file_format = ext.split(".")[-1]
+        audio_path = Path(download_path, f"{title}.{file_format}")
 
         with audio_path.open("wb") as buffer:
             shutil.copyfileobj(audio.file, buffer)
 
+    with audio_path.open("rb") as file:
+        upload_file_to_s3(file, f"{title}.{file_format}", title)
+
     if hasattr(albumCover, "filename"):
-        upload_file_to_s3(albumCover, "albums.png", title)
+        upload_file_to_s3(albumCover.file, "albums.png", title)
     else:
         file = download_image_from_url(albumCover)
         upload_file_to_s3(file, "albums.png", title)
+
     albumCoverUrl = (
         f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/albums.png"
     )
@@ -195,7 +199,6 @@ async def music_separation(
         process_music_separation,
         created_music,
         title,
-        name,
         audio_path,
         db,
     )
