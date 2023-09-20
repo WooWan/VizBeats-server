@@ -17,7 +17,7 @@ class User(Base):
 class Music(Base):
     __tablename__ = "Music"
 
-    id = Column(String, primary_key=True, default=uuid.uuid4().hex)
+    id = Column(String, primary_key=True, default=lambda: uuid.uuid4().hex)
     title = Column(String)
     artist = Column(String)
     albumCover = Column(String)
