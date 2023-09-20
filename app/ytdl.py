@@ -23,7 +23,7 @@ def perform_search(query: str, limit: str):
     )
 
     search_request = youtube.search().list(
-        part="snippet", maxResults=limit, q=f"{query} music"
+        part="snippet", maxResults=limit, q=f"{query} audio"
     )
     search_result = search_request.execute()
     search_items = search_result["items"]
