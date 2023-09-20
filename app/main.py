@@ -93,10 +93,10 @@ def process_music_separation(
 
     with other_path.open("rb") as file:
         upload_file_to_s3(file, "other.mp3", title)
-    #
+
     updated_music = {
         "bassUrl": f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/bass.mp3",
-        "guitarUrl": f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/other.mp3",
+        "guitarUrl": f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/guitar.mp3",
         "drumUrl": f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/drums.mp3",
         "pianoUrl": f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/piano.mp3",
         "vocalUrl": f"https://{BUCKET_NAME}.s3.ap-northeast-2.amazonaws.com/{title}/vocals.mp3",
